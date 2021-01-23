@@ -4,3 +4,5 @@
 ### Remove silences from video
 ### Download videos from youtube
 ### more coming soon
+
+## For now just in Linux
