@@ -5,4 +5,4 @@
 ### Download videos from youtube
 ### more coming soon
 
-## For now just in Linux
+## For now only on Linux
