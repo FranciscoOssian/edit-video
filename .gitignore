@@ -1,3 +1,11 @@
 *.mp4
+*.mkv
+
 *.mp3
+*.wav
+
+*.prof
+
+silence.txt
+
 __pycache__

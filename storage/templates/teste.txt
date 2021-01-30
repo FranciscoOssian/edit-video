@@ -1,0 +1,2 @@
+remove_silence(X,X,-30,1)
+remove_noise(X,X,0)

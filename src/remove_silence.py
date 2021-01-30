@@ -1,7 +1,6 @@
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
 def remove_silence(file_in, file_out):
-    print("ddfd")
     clips = []
     clip = VideoFileClip(file_in)
     times = open("./src/silence.txt", "r")
@@ -14,8 +13,8 @@ def remove_silence(file_in, file_out):
         start, end = line.strip().split()
 
         try:
-            clipTemp = clip.subclip(last_end, start)
-            print("cuting {} to {}".format(last_end, start))
+            clipTemp = clip.subclip(float(last_end), start)
+            print("cuting {} to {}".format(float(last_end)-1, start))
             clips.append(clipTemp)
             last_end = end
 
@@ -23,7 +22,7 @@ def remove_silence(file_in, file_out):
             print(type(ValueError))
             print(ValueError.args)
             print(ValueError)
-            print("erro {} - {}".format(last_end, start))
+            print("erro {} - {}".format(float(last_end), start))
             last_end = end
 
     final_clip  = concatenate_videoclips(clips)
