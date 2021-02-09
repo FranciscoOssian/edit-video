@@ -4,25 +4,33 @@ import sys
 import os
 import pytube
 
-from src.remove_silence import remove_silence
-from src.merge_videos import merge_videos
+from src.commands.remove_noise import remove_noise
+from src.commands.merge_videos import merge_videos
+from src.commands.remove_silence import remove_silence
 
 from src.screens.template import template
 
-os.system("clear")
+os.system('cls' if os.name == 'nt' else 'clear')
+
 print("----------------------EDIT VIDEO-----------------------------")
-print("1) to donwload youtube video")
-print("2) to remove video silence")
-print("3) to remove video noise")
-print("4) to merge videos")
-print("5) create template")
-print("6) edit by template")
-print("7) to exit")
+print("0) to donwload youtube video")
+print("1) to remove video silence")
+print("2) to remove video noise")
+print("3) to merge videos")
+print("4) create template")
+print("5) edit by template")
+print("6) to exit")
 print("----------------------EDIT VIDEO-----------------------------")
 
 opc = int(input(":"))
 
-def opc2():
+def opc0():
+    print("Give URL:")
+    url = input(":")
+    print("loading...")
+    pytube.YouTube(url).streams.get_highest_resolution().download('./videos/input/')
+
+def opc1():
     print("what's the path of file_in")
     file_in = input(":")
 
@@ -34,22 +42,13 @@ def opc2():
 
     print("what is the limit in seconds for cutting? (note that time bands shorter than this value will not be cut)")
     sec = input("seconds (value only):")
-    
-    command = f"""ffmpeg -hide_banner -vn -i {file_in} -af "silencedetect=n={deb}dB:d={sec}" -f null - 2>&1 | grep 'silence_end\|silence_start' | awk '{{if(NR%2!=0)printf $5}}{{if(NR%2==0)printf " " $5 "\\n"}}' > ./src/silence.txt"""
-    
-    os.system(command)
 
-    remove_silence(file_in, file_out)
+    remove_silence(file_in, file_out, deb, sec)
 
-def opc3():
+def opc2():
 
     print("what's the path of file_in")
     file_in = input(":")
-
-    audio_path = "./audios/audio.wav"
-    noise_audio_path = "./audios/noise-audio.wav"
-    audio_clean_path = "./audios/audio-clean.wav"
-    noise_prof_path = "./audios/noise.prof"
 
     print("what's the start_time of noise sample (secs)")
     start_time = input(":")
@@ -57,31 +56,9 @@ def opc3():
     print("what's the duration_time of noise sample (secs)")
     duration_time = input(":")
 
-    commands = [
-        f"ffmpeg -i {file_in} {audio_path}",
-        f"sox {audio_path} {noise_audio_path} trim {start_time} {duration_time}",
-        f"sox {noise_audio_path} -n noiseprof {noise_prof_path}",
-        f"sox {audio_path} {audio_clean_path} noisered {noise_prof_path} 0.21",
-        f"ffmpeg -i {file_in} -i {audio_clean_path} -c:v copy -map 0:v:0 -map 1:a:0 ./videos/video-clean-audio.mp4"
-    ]
+    remove_noise(file_in, start_time, duration_time)
 
-    
-    os.system(commands[0])
-    os.system(commands[1])
-    os.system(commands[2])
-    os.system(commands[3])
-    os.system(commands[4])
-
-if opc == 1:
-    print("Give URL:")
-    url = input(":")
-    print("loading...")
-    pytube.YouTube(url).streams.get_highest_resolution().download('./videos/input/')
-elif opc == 2:
-    opc2()
-elif opc == 3:
-    opc3()
-elif opc == 4:
+def opc3():
     print("first video")
     url1 = input(":")
     print("second video")
@@ -89,10 +66,8 @@ elif opc == 4:
     print("final file name")
     final = input(":")
     merge_videos(url1, url2, final)
-elif opc == 5:
-    template()
-elif opc == 6:
 
+def opc5():
     print("insert the template name")
     template_name = input(":")
 
@@ -113,5 +88,14 @@ elif opc == 6:
         elif cmd_name == "merge_videos":
             print(3)
 
-elif opc == 7:
-    exit()
+cmds = [
+    opc0,
+    opc1,
+    opc2,
+    opc3,
+    template,
+    opc5,
+    exit
+]
+
+cmds[opc]()
